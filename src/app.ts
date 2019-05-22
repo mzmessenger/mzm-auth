@@ -104,6 +104,11 @@ app.get('/auth', (req: any, res: Response) => {
   res.status(401).send('not login')
 })
 
+app.get('/auth/logout', (req: any, res: Response) => {
+  req.logout()
+  res.redirect('/')
+})
+
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 app.use((err, req, res, next) => {
   res.status(500).send('Internal Server Error')

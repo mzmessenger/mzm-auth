@@ -4,17 +4,16 @@ import helmet from 'helmet'
 import session from 'express-session'
 import passport from 'passport'
 import { Strategy as TwitterStrategy } from 'passport-twitter'
-import { ObjectID } from 'mongodb'
-import logger from './logger'
-import * as db from './db'
+import logger from './lib/logger'
 import {
   TWITTER_CONSUMER_KEY,
   TWITTER_CONSUMER_SECRET,
   TWITTER_CALLBACK_URL,
   SESSION_SECRET
 } from './config'
+import * as handlers from './handlers'
 
-const dev = process.env.NODE_ENV !== 'production'
+const dev = process.env.NGODE_ENV !== 'production'
 
 const app = express()
 
@@ -30,17 +29,8 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 
-passport.serializeUser((user: db.User, done) => {
-  done(null, user._id)
-})
-passport.deserializeUser((id: string, done) => {
-  db.collections.users
-    .findOne({ _id: new ObjectID(id) })
-    .then(user => {
-      done(null, user)
-    })
-    .catch(err => done(err))
-})
+passport.serializeUser(handlers.serializeUser)
+passport.deserializeUser(handlers.deserializeUser)
 
 passport.use(
   new TwitterStrategy(
@@ -51,34 +41,7 @@ passport.use(
       includeEmail: true
     },
     async (token, tokenSecret, profile, done) => {
-      try {
-        const filter = {
-          twitterId: profile.id
-        }
-        const update: db.User = {
-          twitterId: profile.id,
-          twitterUserName: profile.username
-        }
-
-        const updated = await db.collections.users.findOneAndUpdate(
-          filter,
-          { $set: update },
-          {
-            upsert: true
-          }
-        )
-        logger.info(
-          `[auth:update:twitter] id: ${updated.value._id}, profile:`,
-          {
-            id: profile.id,
-            username: profile.username
-          }
-        )
-        done(null, updated.value)
-      } catch (e) {
-        logger.error('[auth:update:twitter] error:', profile)
-        done(e)
-      }
+      handlers.twitterLogin(profile.id, profile.username, done)
     }
   )
 )
@@ -92,22 +55,14 @@ app.get(
   })
 )
 
-app.get('/auth', (req: any, res: Response) => {
-  if (req.user) {
-    const user = req.user as db.User
-    const id = user._id.toHexString()
-    res.setHeader('X-USER-ID', id)
-    res.setHeader('X-TWITTER-USER-NAME', user.twitterUserName)
-    logger.info('[auth] id:', id)
-    return res.status(200).send('ok')
-  }
-  res.status(401).send('not login')
-})
+app.get('/auth', handlers.auth)
 
 app.get('/auth/logout', (req: any, res: Response) => {
   req.logout()
   res.redirect('/')
 })
+
+app.delete('/auth/user', handlers.remove)
 
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 app.use((err, req, res, next) => {

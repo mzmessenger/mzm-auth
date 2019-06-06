@@ -10,3 +10,5 @@ export const {
 } = process.env
 
 export const SERVER_LISTEN = 8000
+
+export const REMOVE_STREAM = 'stream:remove:user'

@@ -20,6 +20,7 @@ const app = express()
 app.use(helmet())
 app.use(
   session({
+    name: 'mzm',
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -50,8 +51,8 @@ app.get('/auth/twitter', passport.authenticate('twitter'))
 app.get(
   '/auth/twitter/callback',
   passport.authenticate('twitter', {
-    successRedirect: '/',
-    failureRedirect: '/auth/twitter'
+    successRedirect: '/login/success',
+    failureRedirect: '/'
   })
 )
 

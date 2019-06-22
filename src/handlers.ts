@@ -61,11 +61,16 @@ export async function twitterLogin(
         upsert: true
       }
     )
-    logger.info(`[auth:update:twitter] id: ${updated.value._id}, profile:`, {
+    logger.info(`[auth:update:twitter] id: ${twitterId}, profile:`, {
       id: twitterId,
       username: userName
     })
-    cb(null, updated.value)
+    if (updated.value) {
+      cb(null, updated.value)
+    } else {
+      const user = await db.collections.users.findOne(filter)
+      cb(null, user)
+    }
   } catch (e) {
     logger.error('[auth:update:twitter] error:', twitterId, userName)
     cb(e)

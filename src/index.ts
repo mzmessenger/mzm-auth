@@ -7,9 +7,14 @@ import { consume } from './lib/consumer'
 
 const server = http.createServer(app)
 
-db.connect().then(() => {
-  server.listen(SERVER_LISTEN, () => {
-    logger.info('Listening on', server.address())
+db.connect()
+  .then(() => {
+    server.listen(SERVER_LISTEN, () => {
+      logger.info('Listening on', server.address())
+    })
+    consume()
   })
-  consume()
-})
+  .catch(e => {
+    logger.error(e)
+    process.exit(1)
+  })

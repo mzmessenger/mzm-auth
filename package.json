@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts | bunyan",
+    "start": "ts-node src/server.ts | bunyan",
     "prebuild": "npm run lint",
     "build": "tsc -p tsconfig.json",
     "format": "prettier --write src/**/*.{ts,js}",
@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "bunyan": "^1.8.12",
+    "connect-redis": "^3.4.2",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
     "express-session": "^1.16.2",

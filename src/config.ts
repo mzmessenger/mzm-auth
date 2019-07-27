@@ -9,6 +9,8 @@ export const {
   SESSION_SECRET
 } = process.env
 
+export const WORKER_NUM = 2
+
 export const SERVER_LISTEN = 8000
 
 export const REMOVE_STREAM = 'stream:remove:user'

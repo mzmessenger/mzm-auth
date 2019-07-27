@@ -4,6 +4,7 @@ import helmet from 'helmet'
 import session from 'express-session'
 import passport from 'passport'
 import { Strategy as TwitterStrategy } from 'passport-twitter'
+import connectRedis from 'connect-redis'
 import logger from './lib/logger'
 import {
   TWITTER_CONSUMER_KEY,
@@ -15,11 +16,13 @@ import * as handlers from './handlers'
 
 const dev = process.env.NGODE_ENV !== 'production'
 
+const RedisStore = connectRedis(session)
 const app = express()
 
 app.use(helmet())
 app.use(
   session({
+    store: new RedisStore({ db: 1 }),
     name: 'mzm',
     secret: SESSION_SECRET,
     resave: false,

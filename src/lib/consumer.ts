@@ -28,33 +28,40 @@ export async function parser(read) {
     return
   }
 
+  let nextId = null
+
   for (const [, val] of read) {
     for (const [id, messages] of val) {
+      nextId = id
       try {
         const user = messages[1]
         await remove(user)
-        await redis.xdel(REMOVE_STREAM, id)
       } catch (e) {
         logger.error('parse error', e, id, messages)
       }
     }
   }
+
+  return nextId
 }
 
-export async function consume() {
+export async function consume(startId: string = '$') {
+  let nextId = startId ? startId : '$'
+
   try {
     const res = await redis.xread(
       'BLOCK',
-      '1000',
+      '0',
       'COUNT',
-      '1',
+      '100',
       'STREAMS',
       REMOVE_STREAM,
-      '0'
+      startId
     )
-    await parser(res)
+    nextId = await parser(res)
   } catch (e) {
     logger.error('[read]', REMOVE_STREAM, e)
   }
-  await consume()
+
+  await consume(nextId)
 }

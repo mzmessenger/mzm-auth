@@ -51,7 +51,7 @@ export async function consume(startId: string = '$') {
   try {
     const res = await redis.xread(
       'BLOCK',
-      '0',
+      '1000',
       'COUNT',
       '100',
       'STREAMS',

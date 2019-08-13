@@ -9,7 +9,8 @@ export const collections: {
 
 export async function connect() {
   const client = await MongoClient.connect(MONGODB_URI, {
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    useUnifiedTopology: true
   })
 
   const db = client.db('auth')

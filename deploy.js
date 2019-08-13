@@ -39,7 +39,13 @@ async function deploy({ config, remote, local }) {
     }
   )
 
-  await remote(`sudo rsync -av --delete ${tmpDir}/ ${target}/`)
+  await remote(
+    [
+      `sudo rsync -av --delete`,
+      `--exclude='node_modules'`,
+      `${tmpDir}/ ${target}/`
+    ].join(' ')
+  )
   await remote(`cd ${target} && sudo npm install --production`)
   await remote(`sudo systemctl restart mzm-auth`)
 }

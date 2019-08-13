@@ -10,6 +10,7 @@ const path = require('path')
 const rmtcmd = require('rmtcmd')
 
 async function deploy({ config, remote, local }) {
+  await remote('sudo hostname')
   await local('npm test', { cwd: __dirname })
 
   const target = '/var/www/mzm-auth'
@@ -26,7 +27,7 @@ async function deploy({ config, remote, local }) {
 
   await local(
     [
-      `rsync -av`,
+      `rsync -av --delete`,
       `--exclude='node_modules'`,
       `--exclude='.env'`,
       `-e 'ssh -i ${config.privateKeyPath}'`,
@@ -38,7 +39,7 @@ async function deploy({ config, remote, local }) {
     }
   )
 
-  await remote(`sudo rsync -av --exclude='.env' ${tmpDir}/ ${target}/`)
+  await remote(`sudo rsync -av --delete ${tmpDir}/ ${target}/`)
   await remote(`cd ${target} && sudo npm install --production`)
   await remote(`sudo systemctl restart mzm-auth`)
 }

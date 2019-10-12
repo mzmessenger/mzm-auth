@@ -13,6 +13,7 @@ import {
   SESSION_SECRET
 } from './config'
 import * as handlers from './handlers'
+import client from './lib/redis'
 
 const dev = process.env.NGODE_ENV !== 'production'
 
@@ -22,7 +23,7 @@ const app = express()
 app.use(helmet())
 app.use(
   session({
-    store: new RedisStore({ db: 1 }),
+    store: new RedisStore({ client, db: 1 }),
     name: 'mzm',
     secret: SESSION_SECRET,
     resave: false,

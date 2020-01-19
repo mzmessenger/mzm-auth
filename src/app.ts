@@ -27,8 +27,9 @@ app.use(
     name: 'mzm',
     secret: SESSION_SECRET,
     resave: false,
+    rolling: true,
     saveUninitialized: false,
-    cookie: { secure: !dev }
+    cookie: { secure: !dev, maxAge: 24 * 60 * 60 * 1000 * 30 }
   })
 )
 app.use(passport.initialize())

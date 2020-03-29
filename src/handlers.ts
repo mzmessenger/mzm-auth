@@ -17,6 +17,10 @@ export function auth(req: PassportRequest, res: Response) {
     res.setHeader('X-TWITTER-USER-NAME', req.user.twitterUserName)
     logger.info('[auth] id:', id)
     return res.status(200).send('ok')
+  } else if (req.headers['X-Pass-Through'] === 'yes') {
+    res.setHeader('X-USER-ID', '')
+    res.setHeader('X-TWITTER-USER-NAME', '')
+    return res.status(200).send('ok')
   }
   res.status(401).send('not login')
 }

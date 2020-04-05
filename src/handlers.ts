@@ -38,10 +38,10 @@ export function deserializeUser(
 ) {
   db.collections.users
     .findOne({ _id: new ObjectID(user) })
-    .then(user => {
+    .then((user) => {
       done(null, user)
     })
-    .catch(err => done(err))
+    .catch((err) => done(err))
 }
 
 export async function twitterLogin(

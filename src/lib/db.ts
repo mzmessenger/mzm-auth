@@ -7,7 +7,7 @@ export const collections: {
   removed: Collection<Removed>
 } = { users: null, removed: null }
 
-export async function connect() {
+export const connect = async () => {
   const client = await MongoClient.connect(MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -23,9 +23,11 @@ export async function connect() {
 }
 
 export type User = {
-  _id?: ObjectID
-  twitterId: string
-  twitterUserName: string
+  _id: ObjectID
+  twitterId?: string
+  twitterUserName?: string
+  githubId?: string
+  githubUserName?: string
 }
 
 export type Removed = User & {

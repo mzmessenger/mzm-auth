@@ -4,12 +4,16 @@ import helmet from 'helmet'
 import session from 'express-session'
 import passport from 'passport'
 import { Strategy as TwitterStrategy } from 'passport-twitter'
+import { Strategy as GitHubStrategy } from 'passport-github'
 import connectRedis from 'connect-redis'
 import logger from './lib/logger'
 import {
   TWITTER_CONSUMER_KEY,
   TWITTER_CONSUMER_SECRET,
   TWITTER_CALLBACK_URL,
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
+  GITHUB_CALLBACK_URL,
   SESSION_SECRET
 } from './config'
 import * as handlers from './handlers'
@@ -44,10 +48,26 @@ passport.use(
       consumerKey: TWITTER_CONSUMER_KEY,
       consumerSecret: TWITTER_CONSUMER_SECRET,
       callbackURL: TWITTER_CALLBACK_URL,
-      includeEmail: true
+      includeEmail: true,
+      passReqToCallback: true
     },
-    async (token, tokenSecret, profile, done) => {
-      handlers.twitterLogin(profile.id, profile.username, done)
+    (req, token, tokenSecret, profile, done) => {
+      handlers.loginTwitter(req, profile.id, profile.username, done)
+    }
+  )
+)
+
+passport.use(
+  'github',
+  new GitHubStrategy(
+    {
+      clientID: GITHUB_CLIENT_ID,
+      clientSecret: GITHUB_CLIENT_SECRET,
+      callbackURL: GITHUB_CALLBACK_URL,
+      passReqToCallback: true
+    },
+    (req, accessToken, refreshToken, profile, done) => {
+      handlers.loginGithub(req, profile.id, profile.username, done)
     }
   )
 )
@@ -55,11 +75,22 @@ passport.use(
 app.get('/auth/twitter', passport.authenticate('twitter'))
 app.get(
   '/auth/twitter/callback',
-  passport.authenticate('twitter', {
-    successRedirect: '/login/success',
-    failureRedirect: '/'
-  })
+  passport.authenticate('twitter', { failureRedirect: '/' }),
+  (req, res) => {
+    res.redirect('/login/success')
+  }
 )
+app.delete('/auth/twitter', handlers.remoteTwitter)
+
+app.get('/auth/github', passport.authenticate('github'))
+app.get(
+  '/auth/github/callback',
+  passport.authenticate('github', { failureRedirect: '/' }),
+  (req, res) => {
+    res.redirect('/login/success')
+  }
+)
+app.delete('/auth/github', handlers.remoteGithub)
 
 app.get('/auth', handlers.auth)
 

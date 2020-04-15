@@ -6,7 +6,7 @@ import { REMOVE_STREAM } from '../config'
 
 const REMOVE_STREAM_TO_CHAT = 'stream:remove:user:chat'
 
-export async function remove(user: string) {
+export const remove = async (user: string) => {
   const userId = new ObjectID(user)
   const target = await db.collections.users.findOne({ _id: userId })
   if (!target) {
@@ -23,7 +23,7 @@ export async function remove(user: string) {
   await redis.xadd(REMOVE_STREAM_TO_CHAT, '*', 'user', user)
 }
 
-export async function parser(read) {
+export const parser = async (read) => {
   if (!read) {
     return
   }
@@ -45,7 +45,7 @@ export async function parser(read) {
   return nextId
 }
 
-export async function consume(startId: string = '$') {
+export const consume = async (startId: string = '$') => {
   let nextId = startId ? startId : '$'
 
   try {

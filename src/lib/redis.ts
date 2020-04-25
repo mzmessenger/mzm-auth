@@ -1,7 +1,6 @@
 import Redis from 'ioredis'
-const redis = new Redis({
-  host: '127.0.0.1',
-  enableOfflineQueue: false
-})
+import * as config from '../config'
+
+const redis = new Redis(config.redis.options)
 
 export default redis

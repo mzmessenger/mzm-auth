@@ -16,7 +16,7 @@ export const WORKER_NUM = 2
 
 export const SERVER_LISTEN = 8000
 
-export const REMOVE_STREAM = 'stream:remove:user'
+export const REMOVE_STREAM = 'stream:auth:remove:user'
 
 export const redis = {
   options: {

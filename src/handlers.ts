@@ -191,6 +191,7 @@ export const remoteGithub = async (req: PassportRequest, res: Response) => {
 }
 
 export const remove = async (req: PassportRequest, res: Response) => {
+  logger.info('[remove]', req.user)
   if (req.user) {
     await redis.xadd(REMOVE_STREAM, '*', 'user', req.user._id.toHexString())
     return res.status(200).send('ok')

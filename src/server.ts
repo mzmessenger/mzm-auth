@@ -5,7 +5,7 @@ import redis from './lib/redis'
 import * as db from './lib/db'
 import app from './app'
 import { WORKER_NUM, SERVER_LISTEN } from './config'
-import { consume } from './lib/consumer'
+import { initRemoveConsumerGroup, consume } from './lib/consumer'
 
 const server = http.createServer(app)
 
@@ -20,9 +20,10 @@ if (cluster.isMaster) {
     cluster.fork()
   })
 } else {
-  redis.once('connect', async function connect() {
+  redis.once('ready', async function connect() {
     logger.info('[redis] connected')
     try {
+      await initRemoveConsumerGroup()
       await db.connect()
 
       server.listen(SERVER_LISTEN, () => {

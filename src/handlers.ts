@@ -2,7 +2,7 @@ import { ObjectID } from 'mongodb'
 import { Request, Response } from 'express'
 import * as db from './lib/db'
 import logger from './lib/logger'
-import redis from './lib/redis'
+import { redis } from './lib/redis'
 import { REMOVE_STREAM } from './config'
 
 type Serialize = db.User

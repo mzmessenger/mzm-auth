@@ -1,5 +1,5 @@
 import { ObjectID } from 'mongodb'
-import redis from './redis'
+import { redis } from './redis'
 import logger from './logger'
 import * as db from './db'
 import { REMOVE_STREAM } from '../config'

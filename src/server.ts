@@ -1,13 +1,12 @@
 import cluster from 'cluster'
 import http from 'http'
+import { once } from 'events'
 import logger from './lib/logger'
-import redis from './lib/redis'
+import { redis, sessionRedis } from './lib/redis'
 import * as db from './lib/db'
 import app from './app'
 import { WORKER_NUM, SERVER_LISTEN } from './config'
 import { initRemoveConsumerGroup, consume } from './lib/consumer'
-
-const server = http.createServer(app)
 
 if (cluster.isMaster) {
   for (let i = 0; i < WORKER_NUM; i++) {
@@ -20,23 +19,33 @@ if (cluster.isMaster) {
     cluster.fork()
   })
 } else {
-  redis.once('ready', async function connect() {
+  const main = async () => {
+    redis.on('error', (e) => {
+      logger.error(e)
+      process.exit(1)
+    })
+
+    sessionRedis.on('error', (e) => {
+      logger.error(e)
+      process.exit(1)
+    })
+
+    await Promise.all([once(redis, 'ready'), once(sessionRedis, 'ready')])
+
     logger.info('[redis] connected')
-    try {
-      await initRemoveConsumerGroup()
-      await db.connect()
 
-      server.listen(SERVER_LISTEN, () => {
-        logger.info('Listening on', server.address())
-      })
+    await initRemoveConsumerGroup()
+    await db.connect()
 
-      consume()
-    } catch (e) {
-      redis.emit('error', e)
-    }
-  })
+    const server = http.createServer(app)
+    server.listen(SERVER_LISTEN, () => {
+      logger.info('Listening on', server.address())
+    })
 
-  redis.on('error', function error(e) {
+    consume()
+  }
+
+  main().catch((e) => {
     logger.error(e)
     process.exit(1)
   })

@@ -24,3 +24,11 @@ export const redis = {
     enableOfflineQueue: false
   }
 }
+
+export const sessionRedis = {
+  options: {
+    host: process.env.REDIS_HOST,
+    enableOfflineQueue: false,
+    db: 1
+  }
+}

@@ -32,7 +32,7 @@ export const auth = (req: PassportRequest, res: Response) => {
     )
     logger.info('[auth] id:', id)
     return res.status(200).send('ok')
-  } else if (req.headers['X-Pass-Through'] === 'yes') {
+  } else if (req.headers['x-pass-through'] === 'yes') {
     res.setHeader('X-USER-ID', '')
     res.setHeader('X-TWITTER-USER-ID', '')
     res.setHeader('X-TWITTER-USER-NAME', '')

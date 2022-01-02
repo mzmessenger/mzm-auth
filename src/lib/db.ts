@@ -1,4 +1,4 @@
-import { MongoClient, Collection, ObjectID } from 'mongodb'
+import { MongoClient, Collection, ObjectId } from 'mongodb'
 import { MONGODB_URI } from '../config'
 import logger from './logger'
 
@@ -8,10 +8,7 @@ export const collections: {
 } = { users: null, removed: null }
 
 export const connect = async () => {
-  const client = await MongoClient.connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
+  const client = await MongoClient.connect(MONGODB_URI)
 
   const db = client.db('auth')
   collections.users = db.collection('users')
@@ -23,7 +20,7 @@ export const connect = async () => {
 }
 
 export type User = {
-  _id: ObjectID
+  _id: ObjectId
   twitterId?: string
   twitterUserName?: string
   githubId?: string
@@ -31,5 +28,5 @@ export type User = {
 }
 
 export type Removed = User & {
-  originId: ObjectID
+  originId: ObjectId
 }

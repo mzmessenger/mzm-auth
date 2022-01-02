@@ -1,4 +1,4 @@
-import { ObjectID } from 'mongodb'
+import { ObjectId } from 'mongodb'
 import { Request, Response } from 'express'
 import * as db from './lib/db'
 import logger from './lib/logger'
@@ -45,6 +45,7 @@ export const auth = (req: PassportRequest, res: Response) => {
 
 export const serializeUser = (
   user: Serialize,
+  // eslint-disable-next-line no-unused-vars
   done: (err, user: Deserialize) => void
 ) => {
   done(null, user._id.toHexString())
@@ -52,10 +53,11 @@ export const serializeUser = (
 
 export const deserializeUser = (
   user: Deserialize,
+  // eslint-disable-next-line no-unused-vars
   done: (err, user?: RequestUser) => void
 ) => {
   db.collections.users
-    .findOne({ _id: new ObjectID(user) })
+    .findOne({ _id: new ObjectId(user) })
     .then((user) => {
       done(null, user)
     })
@@ -66,11 +68,12 @@ export const loginTwitter = async (
   req: PassportRequest,
   twitterId: string,
   twitterUserName: string,
+  // eslint-disable-next-line no-unused-vars
   cb: (error: any, user?: Serialize) => void
 ) => {
   try {
     const filter: Pick<db.User, '_id'> | Pick<db.User, 'twitterId'> = req.user
-      ? { _id: new ObjectID(req.user._id) }
+      ? { _id: new ObjectId(req.user._id) }
       : { twitterId }
 
     const update: Pick<db.User, 'twitterId' | 'twitterUserName'> = {
@@ -107,11 +110,12 @@ export const loginGithub = async (
   req: PassportRequest,
   githubId: string,
   githubUserName: string,
+  // eslint-disable-next-line no-unused-vars
   cb: (error: any, user?: Serialize) => void
 ) => {
   try {
     const filter: Pick<db.User, '_id'> | Pick<db.User, 'githubId'> = req.user
-      ? { _id: new ObjectID(req.user._id) }
+      ? { _id: new ObjectId(req.user._id) }
       : { githubId }
 
     const update: Pick<db.User, 'githubId' | 'githubUserName'> = {
@@ -147,7 +151,7 @@ export const remoteTwitter = async (req: PassportRequest, res: Response) => {
     res.status(401).send('not auth')
   }
 
-  const _id = new ObjectID(req.user._id)
+  const _id = new ObjectId(req.user._id)
   const user = await db.collections.users.findOne({ _id })
 
   if (!user.twitterId) {
@@ -171,7 +175,7 @@ export const remoteGithub = async (req: PassportRequest, res: Response) => {
     res.status(401).send('not auth')
   }
 
-  const _id = new ObjectID(req.user._id)
+  const _id = new ObjectId(req.user._id)
   const user = await db.collections.users.findOne({ _id })
 
   if (!user.githubId) {

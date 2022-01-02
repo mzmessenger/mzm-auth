@@ -12,7 +12,7 @@ export const {
   SESSION_SECRET
 } = process.env
 
-export const WORKER_NUM = 2
+export const WORKER_NUM = process.env.WORKER_NUM ?? 1
 
 export const SERVER_LISTEN = 8000
 

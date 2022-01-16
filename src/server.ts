@@ -5,7 +5,7 @@ import logger from './lib/logger'
 import { redis, sessionRedis } from './lib/redis'
 import * as db from './lib/db'
 import app from './app'
-import { WORKER_NUM, SERVER_LISTEN } from './config'
+import { WORKER_NUM, PORT } from './config'
 import { initRemoveConsumerGroup, consume } from './lib/consumer'
 
 if (cluster.isMaster) {
@@ -38,7 +38,7 @@ if (cluster.isMaster) {
     await db.connect()
 
     const server = http.createServer(app)
-    server.listen(SERVER_LISTEN, () => {
+    server.listen(PORT, () => {
       logger.info('Listening on', server.address())
     })
 
